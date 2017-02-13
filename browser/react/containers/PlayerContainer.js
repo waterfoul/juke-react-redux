@@ -1,54 +1,19 @@
-import React, {Component} from 'react';
-import AUDIO from '../audio';
-import store from '../store';
 import {previous, next, setProgress, toggleSong} from '../action-creators/player';
-import Player from '../components/Player';
+import {PlayerMounter} from './PlayerMounterContainer';
+import {connect} from 'react-redux';
 
-export default class extends Component {
-
-  constructor() {
-    super();
-    this.state = store.getState().player;
-    this.toggle = this.toggle.bind(this);
-  }
-
-  componentDidMount() {
-
-    AUDIO.addEventListener('ended', this.next);
-    AUDIO.addEventListener('timeupdate', () => {
-      store.dispatch(setProgress(AUDIO.currentTime / AUDIO.duration));
-    });
-
-    this.unsubscribe = store.subscribe(() => {
-      this.setState(store.getState().player);
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
-  next() {
-    store.dispatch(next());
-  }
-
-  prev() {
-    store.dispatch(previous());
-  }
-
-  toggle() {
-    store.dispatch(
-      toggleSong(this.state.currentSong, this.state.currentSongList)
-    );
-  }
-
-  render() {
-    return <Player
-      {...this.state}
-      next={this.next}
-      prev={this.prev}
-      toggle={this.toggle}
-    />;
-  }
-
+function mapStateToProps(state) {
+  return state.player;
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    next: () => dispatch(next()),
+    prev: () => dispatch(previous()),
+    toggle: (currentSong, currentSongList) => dispatch(toggleSong(currentSong, currentSongList)),
+    timeUpdate: (value) => dispatch(setProgress(value))
+  }
+}
+
+const PlayerContainer = connect(mapStateToProps, mapDispatchToProps)(PlayerMounter);
+export default PlayerContainer;

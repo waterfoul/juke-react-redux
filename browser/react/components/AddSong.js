@@ -1,5 +1,4 @@
 import React from 'react';
-import Songs from './Songs';
 
 export default function (props) {
 
